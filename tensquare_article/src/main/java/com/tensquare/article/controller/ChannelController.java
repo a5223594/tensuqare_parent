@@ -31,7 +31,8 @@ public class ChannelController {
     }
 
     @RequestMapping(value="/{channelId}",method = RequestMethod.PUT)
-    public Result update(@RequestBody Channel channel) {
+    public Result update(@RequestBody Channel channel,@PathVariable String channelId) {
+        channel.setId(channelId);
         channelService.update(channel);
         return new Result(true, StatusCode.OK, "修改成功");
     }

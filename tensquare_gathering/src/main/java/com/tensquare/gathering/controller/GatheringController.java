@@ -32,7 +32,8 @@ public class GatheringController {
     }
 
     @RequestMapping(value="/{gatheringId}",method = RequestMethod.PUT)
-    public Result update(@RequestBody GatheringWithBLOBs gathering) {
+    public Result update(@RequestBody GatheringWithBLOBs gathering,@PathVariable String gatheringId) {
+        gathering.setId(gatheringId);
         gatheringService.update(gathering);
         return new Result(true, StatusCode.OK, "修改成功");
     }

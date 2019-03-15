@@ -76,7 +76,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, jobname, salary, condition, education, type, address, eid, createtime, state, 
+    id, jobname, salary, 'condition', education, type, address, eid, createtime, state,
     url, label, content1, content2
   </sql>
   <select id="selectByExample" parameterType="com.tensquare.recruit.pojo.RecruitExample" resultMap="BaseResultMap">

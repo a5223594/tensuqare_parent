@@ -31,7 +31,8 @@ public class EnterpriseController {
     }
 
     @RequestMapping(value="/{enterpriseId}",method = RequestMethod.PUT)
-    public Result update(@RequestBody Enterprise enterprise) {
+    public Result update(@RequestBody Enterprise enterprise,@PathVariable String enterpriseId) {
+        enterprise.setId(enterpriseId);
         enterpriseService.update(enterprise);
         return new Result(true, StatusCode.OK, "修改成功");
     }

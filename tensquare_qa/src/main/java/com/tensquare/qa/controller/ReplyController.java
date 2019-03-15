@@ -31,7 +31,8 @@ public class ReplyController {
     }
 
     @RequestMapping(value="/{replyId}",method = RequestMethod.PUT)
-    public Result update(@RequestBody Reply reply) {
+    public Result update(@RequestBody Reply reply,@PathVariable String replyId) {
+        reply.setId(replyId);
         replyService.update(reply);
         return new Result(true, StatusCode.OK, "修改成功");
     }

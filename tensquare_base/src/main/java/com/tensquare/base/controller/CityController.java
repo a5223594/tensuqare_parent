@@ -31,7 +31,8 @@ public class CityController {
     }
 
     @RequestMapping(value="/{cityId}",method = RequestMethod.PUT)
-    public Result update(@RequestBody City city) {
+    public Result update(@RequestBody City city,@PathVariable String cityId) {
+        city.setId(cityId);
         cityService.update(city);
         return new Result(true, StatusCode.OK, "修改成功");
     }

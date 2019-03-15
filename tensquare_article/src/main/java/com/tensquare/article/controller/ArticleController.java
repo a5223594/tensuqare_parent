@@ -32,7 +32,8 @@ public class ArticleController {
     }
 
     @RequestMapping(value="/{articleId}",method = RequestMethod.PUT)
-    public Result update(@RequestBody Article article) {
+    public Result update(@RequestBody Article article,@PathVariable String articleId) {
+        article.setId(articleId);
         articleService.update(article);
         return new Result(true, StatusCode.OK, "修改成功");
     }

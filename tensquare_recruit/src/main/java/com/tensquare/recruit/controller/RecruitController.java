@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.RecursiveAction;
 
 @RestController
 @RequestMapping("/recruit")
@@ -31,7 +32,8 @@ public class RecruitController {
     }
 
     @RequestMapping(value="/{recruitId}",method = RequestMethod.PUT)
-    public Result update(@RequestBody Recruit recruit) {
+    public Result update(@RequestBody Recruit recruit,@PathVariable String recruitId) {
+        recruit.setId(recruitId);
         recruitService.update(recruit);
         return new Result(true, StatusCode.OK, "修改成功");
     }

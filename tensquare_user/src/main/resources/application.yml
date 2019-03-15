@@ -3,9 +3,9 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: root
-    url: jdbc:mysql://localhost:3306/tensquare_recruit?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Hongkong
+    url: jdbc:mysql://localhost:3306/tensquare_user?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Hongkong
 server:
-  port: 9002
+  port: 9008
 mybatis:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

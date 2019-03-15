@@ -31,7 +31,8 @@ public class ColumnController {
     }
 
     @RequestMapping(value="/{columnId}",method = RequestMethod.PUT)
-    public Result update(@RequestBody Column column) {
+    public Result update(@RequestBody Column column,@PathVariable String columnId) {
+        column.setId(columnId);
         columnService.update(column);
         return new Result(true, StatusCode.OK, "修改成功");
     }

@@ -31,7 +31,8 @@ public class ProblemController {
     }
 
     @RequestMapping(value="/{problemId}",method = RequestMethod.PUT)
-    public Result update(@RequestBody Problem problem) {
+    public Result update(@RequestBody Problem problem,@PathVariable String problemId) {
+        problem.setId(problemId);
         problemService.update(problem);
         return new Result(true, StatusCode.OK, "修改成功");
     }
