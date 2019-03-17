@@ -9,6 +9,7 @@ import com.tensquare.common.entity.PageResult;
 import com.tensquare.common.util.IdWorker;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,9 @@ public class AdminService {
     @Autowired
     IdWorker idWorker;
 
+    @Autowired
+    BCryptPasswordEncoder encoder;
+
     public List<Admin> findAll() {
         AdminExample example = new AdminExample();
         return adminMapper.selectByExample(example);
@@ -31,7 +35,20 @@ public class AdminService {
 
     public void save(Admin admin) {
         admin.setId(idWorker.nextId()+"");
+        admin.setPassword(encoder.encode(admin.getPassword()));
         adminMapper.insert(admin);
+    }
+
+    public Admin findByLoginnameAndPassword(String loginname, String password) {
+        AdminExample example = new AdminExample();
+        AdminExample.Criteria criteria = example.createCriteria();
+        criteria.andLoginnameEqualTo(loginname);
+        Admin admin = adminMapper.selectByExample(example).get(0);
+        if (admin != null && encoder.matches(password, admin.getPassword())) {
+            return admin;
+        }else{
+            return null;
+        }
     }
 
     public void update(Admin admin) {

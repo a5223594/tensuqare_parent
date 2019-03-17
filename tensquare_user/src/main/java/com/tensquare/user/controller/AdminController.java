@@ -8,7 +8,9 @@ import com.tensquare.common.util.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.bind.ValidationEvent;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin")
@@ -22,6 +24,16 @@ public class AdminController {
     public Result findAll() {
         List<Admin> AdminList = adminService.findAll();
         return new Result(true, StatusCode.OK, "success", AdminList);
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public Result login(@RequestBody Map<String, String> map) {
+        Admin admin = adminService.findByLoginnameAndPassword(map.get("loginname"), map.get("password"));
+        if (admin != null) {
+            return new Result(true, StatusCode.OK, "登录成功");
+        }else{
+            return new Result(false, StatusCode.LOGINERROR, "用户名或密码错误");
+        }
     }
 
     @RequestMapping(method = RequestMethod.POST)

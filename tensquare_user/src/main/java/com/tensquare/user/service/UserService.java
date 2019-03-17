@@ -3,16 +3,21 @@ package com.tensquare.user.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.tensquare.user.mapper.UserMapper;
+import com.tensquare.user.pojo.AdminExample;
 import com.tensquare.user.pojo.User;
 import com.tensquare.user.pojo.UserExample;
 import com.tensquare.common.entity.PageResult;
 import com.tensquare.common.util.IdWorker;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional
@@ -23,6 +28,68 @@ public class UserService {
 
     @Autowired
     IdWorker idWorker;
+
+    @Autowired
+    RedisTemplate redisTemplate;
+
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    BCryptPasswordEncoder encoder;
+
+    public void sendSms(String mobile){
+        Random random = new Random();
+        int max = 999999;
+        int min = 100000;
+        int code = random.nextInt(max);
+        if(code<min){
+            code +=min;
+        }
+        System.out.println(mobile+"验证码:"+code);
+        redisTemplate.opsForValue().set("smscode_"+mobile,code+"", 5,TimeUnit.MINUTES);
+        Map<String, String> map = new HashMap<>();
+        map.put("mobile", mobile);
+        map.put("code", code+"");
+        rabbitTemplate.convertAndSend("sms",map);
+    }
+
+    public void add(User user,String code){
+        String syscode = (String) redisTemplate.opsForValue().get("smscode_"+user.getMobile());
+        if (syscode == null) {
+            throw new RuntimeException("请点击获取验证码");
+        }
+        if(!syscode.equals(code)){
+            throw new RuntimeException("验证码不正确");
+        }
+        UserExample example = new UserExample();
+        UserExample.Criteria criteria = example.createCriteria();
+        criteria.andMobileEqualTo(user.getMobile());
+        List<User> users = userMapper.selectByExample(example);
+        if(users!=null && users.size()>0){
+            throw new RuntimeException("手机号不能重复注册");
+        }
+        user.setPassword(encoder.encode(user.getPassword()));
+        user.setId(idWorker.nextId()+"");
+        user.setFanscount(0);
+        user.setFollowcount(0);
+        user.setOnline(0L);
+        user.setUpdatedate(new Date());
+        user.setRegdate(new Date());
+        user.setLastdate(new Date());
+        userMapper.insert(user);
+    }
+
+    public User findByMobileAndPassword(String mobile, String password) {
+        UserExample example = new UserExample();
+        UserExample.Criteria criteria = example.createCriteria();
+        criteria.andMobileEqualTo(mobile);
+        User user = userMapper.selectByExample(example).get(0);
+        if (user != null && encoder.matches(password,user.getPassword())) {
+            return user;
+        }else
+            return null;
+    }
 
     public List<User> findAll() {
         UserExample example = new UserExample();

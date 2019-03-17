@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -17,6 +18,29 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @RequestMapping(value = "/register/{code}", method = RequestMethod.POST)
+    public Result register(@RequestBody User user, @PathVariable String code) {
+        userService.add(user,code);
+        return new Result(true, StatusCode.OK, "注册成功");
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public Result login(@RequestBody Map<String, String> map) {
+        User user = userService.findByMobileAndPassword(map.get("mobile"), map.get("password"));
+        if (user != null) {
+            return new Result(true, StatusCode.OK, "登录成功");
+        }else{
+            return new Result(false, StatusCode.LOGINERROR, "登录失败");
+        }
+
+    }
+
+    @RequestMapping(value = "/sendsms/{mobile}", method = RequestMethod.POST)
+    public Result sendsms(@PathVariable String mobile) {
+        userService.sendSms(mobile);
+        return new Result(true, StatusCode.OK, "发送成功");
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public Result findAll() {

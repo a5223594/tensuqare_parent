@@ -4,6 +4,8 @@ spring:
     username: root
     password: root
     url: jdbc:mysql://localhost:3306/tensquare_recruit?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Hongkong
+  application:
+    name: tensquare-recruit
 server:
   port: 9002
 mybatis:

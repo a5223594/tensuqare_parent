@@ -7,6 +7,7 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Properties;
 
@@ -35,5 +36,10 @@ public class UserApplication {
         //添加插件
         new SqlSessionFactoryBean().setPlugins(new Interceptor[]{pageHelper});
         return pageHelper;
+    }
+
+    @Bean
+    public BCryptPasswordEncoder bcryptPasswordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 }
