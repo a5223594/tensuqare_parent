@@ -10,3 +10,9 @@ spring:
     name: tensquare-article
 server:
   port: 9004
+eureka:
+  client:
+    service‐url:
+      defaultZone: http://localhost:6868/eureka
+  instance:
+    prefer‐ip‐address: true

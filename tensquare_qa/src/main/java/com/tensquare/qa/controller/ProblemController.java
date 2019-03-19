@@ -1,13 +1,17 @@
 package com.tensquare.qa.controller;
 
+import com.tensquare.common.util.JwtUtil;
+import com.tensquare.qa.client.LabelClient;
 import com.tensquare.qa.pojo.Problem;
 import com.tensquare.qa.service.ProblemService;
 import com.tensquare.common.entity.PageResult;
 import com.tensquare.common.entity.Result;
 import com.tensquare.common.util.StatusCode;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -18,6 +22,20 @@ public class ProblemController {
     @Autowired
     ProblemService problemService;
 
+    @Autowired
+    JwtUtil jwtUtil;
+
+    @Autowired
+    HttpServletRequest request;
+
+    @Autowired
+    LabelClient labelClient;
+
+    @RequestMapping(value = "/label/{labelId}", method = RequestMethod.GET)
+    public Result findLabelById(@PathVariable String labelId) {
+        return labelClient.findById(labelId);
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public Result findAll() {
         List<Problem> ProblemList = problemService.findAll();
@@ -26,15 +44,23 @@ public class ProblemController {
 
     @RequestMapping(method = RequestMethod.POST)
     public Result save(@RequestBody Problem problem) {
-        problemService.save(problem);
-        return new Result(true, StatusCode.OK, "添加成功");
+        Claims claims = (Claims) request.getAttribute("user_claims");
+        if (claims != null) {
+            problemService.save(problem);
+            return new Result(true, StatusCode.OK, "添加成功");
+        }else
+            return new Result(false, StatusCode.ACCESSERROR, "权限不足");
     }
 
     @RequestMapping(value="/{problemId}",method = RequestMethod.PUT)
     public Result update(@RequestBody Problem problem,@PathVariable String problemId) {
-        problem.setId(problemId);
-        problemService.update(problem);
-        return new Result(true, StatusCode.OK, "修改成功");
+        Claims claims = (Claims) request.getAttribute("user_claims");
+        if (claims!=null) {
+            problem.setId(problemId);
+            problemService.update(problem);
+            return new Result(true, StatusCode.OK, "修改成功");
+        }else
+            return new Result(false, StatusCode.ACCESSERROR, "权限不足");
     }
 
     @RequestMapping(value = "/{problemId}", method = RequestMethod.DELETE)

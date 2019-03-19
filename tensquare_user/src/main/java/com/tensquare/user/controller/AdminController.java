@@ -1,5 +1,6 @@
 package com.tensquare.user.controller;
 
+import com.tensquare.common.util.JwtUtil;
 import com.tensquare.user.pojo.Admin;
 import com.tensquare.user.service.AdminService;
 import com.tensquare.common.entity.PageResult;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.bind.ValidationEvent;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +22,9 @@ public class AdminController {
     @Autowired
     AdminService adminService;
 
+    @Autowired
+    JwtUtil jwtUtil;
+
     @RequestMapping(method = RequestMethod.GET)
     public Result findAll() {
         List<Admin> AdminList = adminService.findAll();
@@ -30,7 +35,11 @@ public class AdminController {
     public Result login(@RequestBody Map<String, String> map) {
         Admin admin = adminService.findByLoginnameAndPassword(map.get("loginname"), map.get("password"));
         if (admin != null) {
-            return new Result(true, StatusCode.OK, "登录成功");
+            Map<String,String> resultMap = new HashMap<>();
+            String token = jwtUtil.createJWT(admin.getId(), admin.getLoginname(), "admin");
+            resultMap.put("token", token);
+            resultMap.put("name", admin.getLoginname());
+            return new Result(true, StatusCode.OK, "登录成功",resultMap);
         }else{
             return new Result(false, StatusCode.LOGINERROR, "用户名或密码错误");
         }

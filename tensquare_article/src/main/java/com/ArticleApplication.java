@@ -1,16 +1,19 @@
 package com;
 
 import com.github.pagehelper.PageHelper;
+import com.tensquare.common.filter.JwtFilter;
 import com.tensquare.common.util.IdWorker;
 import org.apache.ibatis.plugin.Interceptor;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Properties;
 
 @SpringBootApplication
+@EnableEurekaClient
 public class ArticleApplication {
     public static void main(String[] args) {
         SpringApplication.run(ArticleApplication.class);
@@ -35,5 +38,10 @@ public class ArticleApplication {
         //添加插件
         new SqlSessionFactoryBean().setPlugins(new Interceptor[]{pageHelper});
         return pageHelper;
+    }
+
+    @Bean
+    public JwtFilter jwtFilter() {
+        return new JwtFilter();
     }
 }

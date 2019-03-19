@@ -91,6 +91,13 @@ public class UserService {
             return null;
     }
 
+    public void incFanscount(String userid,int x) {
+        userMapper.incFanscount(userid,x);
+    }
+    public void incFollowcount(String userid,int x) {
+        userMapper.incFollowcount(userid,x);
+    }
+
     public List<User> findAll() {
         UserExample example = new UserExample();
         return userMapper.selectByExample(example);
@@ -98,6 +105,7 @@ public class UserService {
 
     public void save(User user) {
         user.setId(idWorker.nextId()+"");
+        user.setPassword(encoder.encode(user.getPassword()));
         userMapper.insert(user);
     }
 

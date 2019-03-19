@@ -382,4 +382,11 @@
       followcount = #{followcount,jdbcType=INTEGER}
     where id = #{id,jdbcType=VARCHAR}
   </update>
+
+  <update id="incFanscount" >
+    update tb_user set fanscount = fanscount+#{x} where id=#{userid}
+  </update>
+  <update id="incFollowcount">
+    update tb_user set followcount = followcount+#{x} where id=#{userid}
+  </update>
 </mapper>

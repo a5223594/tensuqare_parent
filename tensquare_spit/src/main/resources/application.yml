@@ -9,3 +9,9 @@ spring:
       host: 192.168.229.134
   redis:
     host: 192.168.229.134
+eureka:
+  client:
+    service‐url:
+      defaultZone: http://localhost:6868/eureka
+  instance:
+    prefer‐ip‐address: true

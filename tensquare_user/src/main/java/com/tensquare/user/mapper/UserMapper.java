@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Mapper
 public interface UserMapper {
@@ -30,4 +31,8 @@ public interface UserMapper {
     int updateByPrimaryKeySelective(User record);
 
     int updateByPrimaryKey(User record);
+
+    void incFanscount(@Param("userid")String userid,@Param("x") int x);
+
+    void incFollowcount(@Param("userid")String userid,@Param("x")int x);
 }

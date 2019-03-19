@@ -1,13 +1,17 @@
 package com.tensquare.user.controller;
 
+import com.tensquare.common.util.JwtUtil;
 import com.tensquare.user.pojo.User;
 import com.tensquare.user.service.UserService;
 import com.tensquare.common.entity.PageResult;
 import com.tensquare.common.entity.Result;
 import com.tensquare.common.util.StatusCode;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +23,21 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    HttpServletRequest request;
+
+    @Autowired
+    JwtUtil jwtUtil;
+
+    @RequestMapping(value = "/incfans/{userid}/{x}",method = RequestMethod.POST)
+    public void incFansCount(@PathVariable String userid, @PathVariable int x) {
+        userService.incFanscount(userid,x);
+    }
+    @RequestMapping(value = "/incfollow/{userid}/{x}",method = RequestMethod.POST)
+    public void incFollowcount(@PathVariable String userid, @PathVariable int x) {
+        userService.incFollowcount(userid,x);
+    }
+
     @RequestMapping(value = "/register/{code}", method = RequestMethod.POST)
     public Result register(@RequestBody User user, @PathVariable String code) {
         userService.add(user,code);
@@ -29,7 +48,12 @@ public class UserController {
     public Result login(@RequestBody Map<String, String> map) {
         User user = userService.findByMobileAndPassword(map.get("mobile"), map.get("password"));
         if (user != null) {
-            return new Result(true, StatusCode.OK, "登录成功");
+            String token = jwtUtil.createJWT(user.getId(), user.getNickname(), "user");
+            Map<String,String> resultMap = new HashMap<>();
+            resultMap.put("token", token);
+            resultMap.put("name", user.getNickname());
+            resultMap.put("avatar",user.getAvatar());
+            return new Result(true, StatusCode.OK, "登录成功",resultMap);
         }else{
             return new Result(false, StatusCode.LOGINERROR, "登录失败");
         }
@@ -63,6 +87,10 @@ public class UserController {
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
     public Result delete(@PathVariable String userId) {
+        Claims claims = (Claims) request.getAttribute("admin_claims");
+        if (claims == null) {
+            return new Result(false, StatusCode.ACCESSERROR, "权限不足");
+        }
         userService.delete(userId);
         return new Result(true, StatusCode.OK, "删除成功");
     }

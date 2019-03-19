@@ -5,9 +5,11 @@ import com.tensquare.qa.service.ReplyService;
 import com.tensquare.common.entity.PageResult;
 import com.tensquare.common.entity.Result;
 import com.tensquare.common.util.StatusCode;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -18,6 +20,9 @@ public class ReplyController {
     @Autowired
     ReplyService replyService;
 
+    @Autowired
+    HttpServletRequest request;
+
     @RequestMapping(method = RequestMethod.GET)
     public Result findAll() {
         List<Reply> ReplyList = replyService.findAll();
@@ -26,8 +31,13 @@ public class ReplyController {
 
     @RequestMapping(method = RequestMethod.POST)
     public Result save(@RequestBody Reply reply) {
-        replyService.save(reply);
-        return new Result(true, StatusCode.OK, "添加成功");
+        Claims claims = (Claims) request.getAttribute("user_claims");
+        if (claims!=null) {
+             replyService.save(reply);
+            return new Result(true, StatusCode.OK, "添加成功");
+        }else
+            return new Result(false, StatusCode.ACCESSERROR, "权限不足");
+
     }
 
     @RequestMapping(value="/{replyId}",method = RequestMethod.PUT)

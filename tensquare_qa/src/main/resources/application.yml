@@ -8,3 +8,16 @@ spring:
     name: tensquare-qa
 server:
   port: 9003
+jwt:
+  config:
+    key: huanglinjie
+    ttl: 360000
+eureka:
+  client:
+    service‐url:
+      defaultZone: http://localhost:6868/eureka
+  instance:
+    prefer‐ip‐address: true
+feign:
+  hystrix:
+    enabled: true
